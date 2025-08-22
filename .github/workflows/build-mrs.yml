@@ -9,18 +9,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
-      # 1. 下载真正的 v1.18.5 并改名，避免 PATH 冲突
-      - name: Download converter
+      - name: Download rule-converter
         run: |
-          curl -L https://github.com/MetaCubeX/mihomo/releases/download/v1.18.5/mihomo-linux-amd64-v1.18.5.gz | gzip -d > /tmp/mihomo-converter
-          chmod +x /tmp/mihomo-converter
-
-      # 2. 绝对路径调用，确保不会误用系统版本
-      - name: Convert to mrs
-        run: /tmp/mihomo-converter convert-ruleset yaml domain emby.yaml emby.mrs
-
-      # 3. 上传产物
+          curl -L https://github.com/MetaCubeX/mihomo/releases/download/v1.18.5/mihomo-rule-converter-linux-amd64-v1.18.5.gz | gzip -d > converter
+          chmod +x converter
+      - name: Convert
+        run: ./converter --input emby.yaml --behavior domain --format yaml --output emby.mrs
       - uses: actions/upload-artifact@v4
         with:
           name: emby-mrs
