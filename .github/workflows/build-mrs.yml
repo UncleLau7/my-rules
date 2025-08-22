@@ -1,0 +1,21 @@
+name: build-mrs
+on:
+  push:
+    paths:
+      - emby.yaml
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download v1.18.5 binary
+        run: |
+          wget -qO- https://github.com/MetaCubeX/mihomo/releases/download/v1.18.5/mihomo-linux-amd64-v1.18.5.gz | gzip -d > mihomo
+          chmod +x mihomo
+      - name: Convert
+        run: ./mihomo convert-ruleset yaml domain emby.yaml emby.mrs
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: emby-mrs
+          path: emby.mrs
