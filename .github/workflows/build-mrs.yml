@@ -3,17 +3,25 @@ on:
   push:
     paths:
       - emby.yaml
+  workflow_dispatch:
+
 jobs:
-  build:
+  convert:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Download v1.18.5 binary
+
+      # 下载真正带 convert-ruleset 的 v1.18.5
+      - name: Download mihomo-v1.18.5
         run: |
-          wget -qO- https://github.com/MetaCubeX/mihomo/releases/download/v1.18.5/mihomo-linux-amd64-v1.18.5.gz | gzip -d > mihomo
+          wget -q https://github.com/MetaCubeX/mihomo/releases/download/v1.18.5/mihomo-linux-amd64-v1.18.5.gz
+          gzip -d mihomo-linux-amd64-v1.18.5.gz
+          mv mihomo-linux-amd64-v1.18.5 mihomo
           chmod +x mihomo
-      - name: Convert
+
+      - name: Convert to mrs
         run: ./mihomo convert-ruleset yaml domain emby.yaml emby.mrs
+
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
