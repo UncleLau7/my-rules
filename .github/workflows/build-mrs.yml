@@ -10,15 +10,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # 1. 下载真正带 convert-ruleset 的 v1.18.5
-      - name: Fetch converter
+      # 1. 下载真正的 v1.18.5 并改名，避免 PATH 冲突
+      - name: Download converter
         run: |
-          curl -L https://github.com/MetaCubeX/mihomo/releases/download/v1.18.5/mihomo-linux-amd64-v1.18.5.gz | gzip -d > converter
-          chmod +x converter
+          curl -L https://github.com/MetaCubeX/mihomo/releases/download/v1.18.5/mihomo-linux-amd64-v1.18.5.gz | gzip -d > /tmp/mihomo-converter
+          chmod +x /tmp/mihomo-converter
 
-      # 2. 转换
-      - name: Convert
-        run: ./converter convert-ruleset yaml domain emby.yaml emby.mrs
+      # 2. 绝对路径调用，确保不会误用系统版本
+      - name: Convert to mrs
+        run: /tmp/mihomo-converter convert-ruleset yaml domain emby.yaml emby.mrs
 
       # 3. 上传产物
       - uses: actions/upload-artifact@v4
