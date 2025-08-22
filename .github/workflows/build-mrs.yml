@@ -1,27 +1,33 @@
 name: build-mrs
+
 on:
   push:
     paths:
-      - emby.yaml
-  workflow_dispatch:
+      - emby.yaml          # 只要 emby.yaml 有变动就触发
+  workflow_dispatch:        # 也可手动点 Run
 
 jobs:
   convert:
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
 
-      # 下载真正带 convert-ruleset 的 v1.18.5
-      - name: Download mihomo-v1.18.5
+    steps:
+      # 1. 拉取仓库
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # 2. 下载带 convert-ruleset 的 v1.18.5
+      - name: Download mihomo v1.18.5
         run: |
           wget -q https://github.com/MetaCubeX/mihomo/releases/download/v1.18.5/mihomo-linux-amd64-v1.18.5.gz
           gzip -d mihomo-linux-amd64-v1.18.5.gz
           mv mihomo-linux-amd64-v1.18.5 mihomo
           chmod +x mihomo
 
+      # 3. 执行转换
       - name: Convert to mrs
         run: ./mihomo convert-ruleset yaml domain emby.yaml emby.mrs
 
+      # 4. 上传产物
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
